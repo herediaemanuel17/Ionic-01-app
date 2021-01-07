@@ -18,6 +18,7 @@ Vehículo que contiene en el modelo la letra ‘Y’: Yamaha YBR $80.500,50
 =============================
 
 Vehículos ordenados por precio de mayor a menor:
+
 Peugeot 208
 Peugeot 206
 Yamaha YBR
