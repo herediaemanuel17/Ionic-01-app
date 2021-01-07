@@ -34,7 +34,7 @@ public class Vehiculo {
 	public void setMarca(String marca) {
 		this.marca = marca;
 	}
-	
+	/*
 	Collections.sort(vehiculo, new Comparator() {
 		@Override
 		public int compare(Persona p1, Persona p2) {
@@ -42,4 +42,5 @@ public class Vehiculo {
 			return new Integer(p2.getEdad()).compareTo(new Integer(p1.getEdad()));
 		}
 	});
+	*/
 }

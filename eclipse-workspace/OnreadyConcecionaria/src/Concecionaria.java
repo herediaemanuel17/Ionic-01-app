@@ -1,14 +1,18 @@
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
-Collections.sort(personas, new Comparator() {
-	@Override
-	public int compare(Persona p1, Persona p2) {
-		// Aqui esta el truco, ahora comparamos p2 con p1 y no al reves como antes
-		return new Integer(p2.getEdad()).compareTo(new Integer(p1.getEdad()));
-	}
-});
+
+
 
 public class Concecionaria {
+	public static void imprimirDeMAyoraMenor(ArrayList<Vehiculo> l) {
+		
+		Collections.sort(l, new OrdenVehiculos().reversed()); 
+		for(Vehiculo v:l) {
+			System.out.println(v.getMarca()+" "+v.getModelo());
+		}
+	}
 	
 	public static void listarVehiculos(ArrayList<Vehiculo> l) {
 		for(Vehiculo v : l) {
@@ -16,7 +20,7 @@ public class Concecionaria {
 				System.out.println("Marca: "+v.getMarca()+" // Modelo: "+v.getModelo()+ " // Puertas: "+ ((Auto) v).getCantPuertas()+" // Precio: $"+v.getPrecio());
 				
 			}else{
-				System.out.println("Marca: "+v.getMarca()+" // Modelo: "+v.getModelo()+ " // Puertas: "+ ((Moto) v).getCilindradas()+"cc // Precio: $"+v.getPrecio());
+				System.out.println("Marca: "+v.getMarca()+" // Modelo: "+v.getModelo()+ " // Cilindradas: "+ ((Moto) v).getCilindradas()+"cc // Precio: $"+v.getPrecio());
 			};
 		}
 	}
@@ -51,33 +55,38 @@ public class Concecionaria {
 			if(v.getModelo().indexOf("Y")!=-1) {
 				System.out.println("Vehículo que contiene en el modelo la letra ‘Y’: "+v.getMarca()+" "+v.getModelo()+" $"+v.getPrecio());
 			}
-			break;
 		}
 		
 	}
+	
+	
 	public static void main(String[] args) {
-		//Lista lis=new Lista();
+	
 		ArrayList<Vehiculo> lis = new ArrayList<Vehiculo>();
 		
 		lis.add(new Auto("Peugeot","206",(float)200000,4));
 		lis.add(new Moto("Honda","Titan",(float)60000,125));
 		lis.add(new Auto("Peugeot","208",(float)250000,5));
 		lis.add(new Moto("Yamaha","YBR",(float) 80500.5,160));
-		/*
 		
-		lis.insertar(nuevoAuto);
-		Vehiculo nuevaMoto=;
-		lis.insertar(nuevaMoto);
-		Vehiculo nuevoAuto2=;
-		lis.insertar(nuevoAuto2);
-		Vehiculo nuevaMoto2=;
-		lis.insertar(nuevaMoto2);
-		*/
-		//System.out.println()
 		
 		listarVehiculos(lis);
 		
+		System.out.println("===============================================  \n");
 		
+		vehiculoMasCaro(lis);
+		
+		System.out.println("===============================================  \n");
+		
+		vehiculoMasBarato(lis);
+		
+		System.out.println("===============================================  \n");
+		
+		vehiculoConLetra(lis);
+		
+		System.out.println("=============================================== \n");
+		
+		imprimirDeMAyoraMenor(lis);
 		
 		
 	}
