@@ -1,0 +1,235 @@
+Curso de Ionic
+
+Isntalar todo lo que esta en el Git Hub del profesor
+https://gist.github.com/Klerith/1a2801452e4abbb30ff29a1da0cbc057
+
+Para instalar Ionic se debe usar la linea de comando 
+$npm install -g @ionic/cli
+
+Para comenzar creamos una carpeta para los proyectos Ionic(Documentos/Ionic)
+iniciamos un proyecto en ionic con el comando
+$ionic start myApp tabs
+
+Al inicio de la instalacion nos preguntara si queremos usar Angular, React o Vue,
+Seleccionamos Angular
+cuando nos pregunte si queremos usar plugins de capacitor ponemos Si
+
+Una vez creado el proyecto accedemos a la carpeta con
+$cd 01my-app
+
+Iniciamos el proyecto con
+$ionic serve
+Con el siguiente comando se puede levantar la aplicacion tanto en android como en Ios
+$ionic serve --lab
+*Una vez iniciado el proyecto, se nos abrira el navegador con la web de la carcaza del proyecto
+
+*****************************************************************************************
+GIT HUB
+DEsde la consola VSC podemos controlar el repositorio de GitHub.
+PAra Commitear primero debemos
+git status
+git add.
+git commit -m "nombre de commit"
+giy checkout -- .  *comando para revertir ultimo cambio al ultimo commit realizado*
+
+PAra subir todo al repositorio de GIT
+git remote add origin https://github.com/herediaemanuel17/Ionic-01-app.git *para crear repo*
+git branch -M master
+git push -u origin master
+***********************************************************************************************
+Crear un Proyecto de angular
+Desde linea de comando se ingresa el comando 
+$ng new 02base-angular
+luego se procede a renombrar la carpeta con un valor 02
+se instala boostrap desde la pagina se copia la linea de CSS
+Ingreamos a la carpeta del nuevo proyecto
+iniciamos el proyecto de angular con 
+$ng serve -o
+procedemos a pegar el codigo previamente copiado en el index.html
+El paso anterior mejora la vista de la pagina
+
+Luegi en app.component.html borramos todo y escribimos hola mundo.
+para que no este todo pegado, en el index en Body agregamos una clase llamada container
+<body class="container">
+
+****************************
+Componentes basicos
+Creamos un componente
+Con el siguiente comando crea un componente sin modificar los directorios
+$ng g c pages/about --dry-run
+
+En realidad lo que se quiere hacer es crear un componente modificando los directorios por lo tnato se 
+saca --dry-run
+$ng g c pages/about
+esto creara la carpeta pages
+
+Creamos otro componente lamada contact
+$ng g c pages/contact
+
+Al dirigirnos a la carpeta about.componentes.ts tendremos el 
+"selector" *este es el selector que nos permite inyectar el componente en otro lado*
+selector: 'app-about'   
+en app.component.html colocamos la siguiente linea
+
+<app-about></app-about>
+lo mismo con app-contact
+<app-contact></app-contact>
+
+PAra que sean visibles desde la pagina web deben estar declarqados en el archivo aap.modules.ts
+Tambien crearemos un componente llamado home
+**************************************************************
+RUTAS DE LAS PAGINAS
+Ahora lo que se va a ahcer es crear una pagina para cada componente que se creo con su propia ruta
+Se debe crear un manejador de rutas para ello se usara la consola
+
+$ng g m appRouting --dry-run *este comando crara una carpeta nueva y adentro el archivo necesario, 
+con el uso del comando --dry-run te dice que va a ahcer el comando pero sin realizar modificacio
+$ng g m appRouting --flat creara el archivo de rutas necesario pero sinc rear un nuevo directorio
+
+Dentro del archivo app-routing-module.ts agregamos la siguiente lineas
+
+import { Routes } from '@angular/router';
+import { HomeComponent } from './pages/home/home.component';
+import { AboutComponent } from './pages/about/about.component';
+import { ContactComponent } from './pages/contact/contact.component';
+
+const routes: Routes =[
+  {
+    path: 'home',
+    component: HomeComponent
+  },
+  {
+    path: 'about',
+    component: AboutComponent
+  },
+  {
+    path: 'contact',
+    component: ContactComponent
+  },
+  {
+    path: '**',
+    redirectTo: 'home'
+  }
+];
+
+Con esto no se veran cambios en la pagina WEb, se debe trabajar sobre la parte del archivo anterior que dice @NgModule
+
+@NgModule({
+  declarations: [],
+  imports: [
+    RouterModule.forRoot( routes )			*se borro la linea y se agregaron estas y a su vez se deben exportar,
+  ],
+  exports:[
+    RouterModule
+  ]
+})
+export class AppRoutingModule { }
+
+PAra que funcione se debe modificar el app.module.ts en lña seccion de los imports
+imports: [
+    BrowserModule,
+    AppRoutingModule **linea agregada, verificar qu se importa arriba
+  ],
+
+Con esto a pesar que se cambie la ruta en la barra de direcciones seguira mostrando lo mismo, por lo
+tanto sera necesario agregar en app.componet.html la linea
+
+<router-outlet></router-outlet> *esto generara una ruta para cada componente
+************************************************************************************************************
+CREAR UN MENU PARA NAVEGAR ENTRE PANTALLAS
+
+Procedemos a crear el componente Menu
+$ng g c components/menu *esto generara una carpeta componen/menu
+
+procedemos a borrar y agregamos una etiqueta para una lsita ordenada con <ul></ul>
+de enlaces ref 
+
+<ul class= "list-group">
+    <a href=""
+        class="list-group-item">
+        Ir a la pagina XXX
+    </a>
+</ul>
+
+En el archivo app.modules.ts deberia estar importado el componente, 
+para verlo hay que agregar <app-menu></app-menu> en app.component.html
+
+Se va a modificar el href con un routerlink el cual redirigira a home
+<ul class= "list-group">
+    <a routerLink="/home"
+        class="list-group-item">
+        Ir Home
+    </a>
+
+    <a routerLink="/home"
+        class="list-group-item">
+        Ir About
+    </a>
+</ul>
+
+ESto nos permitira tener la opcion en todas las paginas con un boton de redireccionamiento a home y a about
+
+Ahora en menu.componets.ts debajo de export
+
+rutas = [
+    {
+      name: 'Home',
+      path: '/home'
+    },
+    {
+      name: 'About',
+      path: '/about'
+    },
+    {
+      name: 'Contact',
+      path: '/contact'
+    },
+  ];
+
+Para que esto surja efecto se debe modificar el menu.component.ts
+y cambiar el codigo a 
+<ul class= "list-group">
+    <a routerLink="{{ ruta.path }}"
+        class="list-group-item"
+        *ngFor="let ruta of rutas">
+        {{ ruta.name }}
+    </a>
+</ul>
+PAra una mejor estructuracion se deberia cambiar a 
+<ul class= "list-group">
+    <a [routerLink]="ruta.path" *con el uso de los corchetes enlazo la ruta en "" a la variable dentro de []
+        class="list-group-item"
+        *ngFor="let ruta of rutas">
+        {{ ruta.name }}
+    </a>
+</ul>
+***************************************************************************************
+Modulo de Paginas
+Normalmente si creamos muchas paginas estaran en app.modules.ts, pero esto no es bueno deberia estar mas limpio
+Se pueden organizar los componentes en otro lugar
+Procedemos a crear una carpeta dentro de Pages
+$ng g m pages/pages --flat se puede ver que se creo la carpeta
+
+Esto permite borrar los componentes About, Home y contac de app.modules.ts
+En pages.modules.ts agregamos HomeComponent,AboutComponent y contaccomponent, estoa gregara de manera automatica los imports
+
+@NgModule({
+  declarations: [
+    HomeComponent,
+    AboutComponent,
+    ContactComponent
+  ],
+  exports: [
+    HomeComponent,
+    AboutComponent,
+    ContactComponent
+  ],
+  imports: [
+    CommonModule
+  ]
+})
+export class PagesModule { }
+
+en app.module.ts debemos importar PagesModule de esta forma evito sobrecargar app.modules.ts y sabe donde hay paginas
+@Se detuvo el proyectopor una pausa, para renaudar se deve ingresar $ng serve -o@
+
