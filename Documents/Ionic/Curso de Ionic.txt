@@ -526,6 +526,98 @@ onClick() { //listener creado por nosotros
     this.clickPost.emit(1); //lo que esta entre parentesis es lo que recibe el padre en su evento. mas alla de que nosotros declaramos que enviabamos un num
   }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 Termina repaso de angular
 SECCION 4
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////7
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+PRIMRA APLICACION DE IONIC
+
+
+iniciamos un proyect ionic con 
+$ionic start component balnk
+Borramos la carpeta Home para iniciarla desde cero.
+
+Creamos una pagina de inicio
+$ionic g page pages/inicio --spec=false
+
+Ionic creara automaticamente las rutasen app-routing.modules.ts
+en esta oportunidad eliminamos la pagina home y redirigimos a la pagina inicio
+
+const routes: Routes = [
+ 
+  {
+    path: 'inicio',		*nombre del path osea el nombre del link de la pagina
+    loadChildren: () => import('./pages/inicio/inicio.module').then( m => m.InicioPageModule)
+  },
+  {
+    path: '',
+    redirectTo: 'inicio',
+    pathMatch: 'full'
+  },
+  
+];
+
+
+******************************************
+
+Navegacion entre paginas
+
+creo dos paginas mas alert y action-sheet
+con el comando 
+$ionic g page pages/"nombre del componente o pagina" --spec=false
+
+Para navegar entre las aginas incorporamos un boton de ionic dentro de ion-content
+<ion-content>
+  <ion-button routerLink="/alert">
+    Alert 
+  </ion-button>
+</ion-content>
+
+
+pero con esto no tenemos una forma de regresar osea la flechita en ios si arrastramos la pantalla hacia la derecha volvemos hacia atras
+Lo mismo para crear el boton a la pagina action-sheet
+********************************************************
+Boton para regresar 
+
+si visualziamos el HTML de action-sheet por ejemplo, 
+en la barra donde aparece el nombre osea el tolbar, se puede dividir en 3 secciones
+star, parte media sin nombre y end.
+hay veces que puede aparecer debajo de tolbar 
+slot="end o start" con esto le decimos a ionic en que punto posicionar un elemento
+<ion-header>
+  <ion-toolbar>
+    <ion-title>action-sheet</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+
+
+Si lo editamos quedara asi 
+<ion-header>
+  <ion-toolbar>
+
+    <ion-buttons slot="start">
+
+      <ion-back-button
+      defaultHref="/" *de esta forma le decimos que si no hay pagina anterior me lelve al inicio y cambiandole el texto
+      text="Regresar" texto en el boton
+      color="primary" color por defecto
+      mode="ios">>    modo apariencia ios con "md" es tipo android
+
+      </ion-back-button>
+
+    </ion-buttons>
+
+    <ion-title>action-sheet</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+Hacer lo mismo en la pagina de alert
+
+PAra ver esto se puede acceder a la documentacion de Ionic en el buscador poner 
+ion-back-button
+
