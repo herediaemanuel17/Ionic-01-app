@@ -232,4 +232,300 @@ export class PagesModule { }
 
 en app.module.ts debemos importar PagesModule de esta forma evito sobrecargar app.modules.ts y sabe donde hay paginas
 @Se detuvo el proyectopor una pausa, para renaudar se deve ingresar $ng serve -o@
+****************************************************************************************************
+Lazy load de PostComponent
 
+se crea la carpeta post en app>pages>posts 
+DEsntro de esta carpeta se va a crear un modulo para comprobar todo lo referido a los posteos y una ruta especialziada para mostrar
+informacion sobre los posteos
+
+$ng g m pages/posts --routing *este comando creara dos archivos dentro de la carpeta.
+
+los archivos seran similares a los de ruta anteriores pero a diferencia que en vez de decir forRoot dice forChild porque solo hay un root
+Ahora se procede a crear un componente, el comando es el mismo solo se cambia la M por una C de component y se saca el --routing
+
+en el ardchuivo post.routing.ts agregamos una ruta pero la ruta se va a agregar de manera que no sea realizar una carga peresosa
+osea solo vamos a cargar la pagina que se desea ver y si hay otras paginas que no sonb accedidas abitualmente solo se cargaran al momento de solicitarlas 
+
+Para ello en elarchivo de las rutas app-routing.modules.ts.
+Ene ste archivo podriamos nombrar el path de posts y cargar el componente con compoinent:PostComponent, pero no se haria uso del LazyLoad, para ellos se usara el siguiente codigo
+{
+    path: 'posts',
+    //loadChildren: './pages/posts/posts.module#PostModule' * Despues del # pondria el modulo a importar, pero se puede mejorar
+    loadChildren: () => import ('./pages/posts/posts.module').then( m => m.PostsModule ) *mejor con carga peresoza
+},
+
+Loultimo nos sirve mejor, cargara la informacion pero nos va a responder una "promesa", una vez cargado el modulo lo retornamos con la parte de  .then(m=>m.PostModule)
+es lo mismo que la linea anterior pero mejor, en Ionic se ve asi ya que es el nuevo estandar y asi se recomienda para la carga de modulos menos propensa para errores
+
+ahora en el archivo de menu menu.components.ts agrego una ruta
+de Posts 
+{
+      name: 'Posts',
+      path: '/posts'
+   },
+
+De esta fiorma aparecera en el menu la opcion de posts y yo se que es con carga peresosa porque utilice la funcion de loadchildren 
+Ionic todo esto lo hace de forma automatica dandole mas rapidez, solo carga la primera pagina
+*********************************************************************************************************************************
+25- servicios y Data Exerna (obtenemos datos de un archivo externo en un servidor externo JSON)
+En esta oportunidad procedemos a realizar modificaciones en el archivo post.component.html
+<h1>Post</h1>
+<ul class="list-group">
+    <li *ngFor="let post of [1,1,1,1]" class="list-group-item">
+        <h2>Titulo</h2>
+        <p>
+            Hola Mundo
+        </p>
+    </li>
+
+</ul>
+Accedemos al archivo en el link https://jsonplaceholder.typicode.com/posts es un archivo Json para practicar, de esta forma 
+consumiremos los datos de ese archivo json.
+Lo mejor para compartir estos datos es ponerlo en un lugar llamado "SERVICE" de esta forma compartiremos la info en todos los componentes que lo requieran esto se puede hacer con un 
+comando de angular
+$ng g s servcices/data --spec=false *el false es para no crear el archivo de prueba sino solamente el servicio.
+Este comando en Angular no funciona mas en su reemplazo se utiliza 
+$ng g s services/data --skipTests
+En Ioonic si funciona
+Este comando no modifica el app.module porque si vemos el archivo data.service.ts tiene una propiedad llamada 
+providedIn: 'root'
+
+El servicio va a tener la logia para obtener los mensajes en el archivo Json, para realizar una peticion a un servidor HTTP
+sera necesario importar un modulo nativo de Angular, para ello sera necesario ir al archivo app.module.ts
+import {HttpClientModule} from '@angular/common/http'
+y colocamos el HTTP en los import
+ imports: [
+    BrowserModule,
+    AppRoutingModule,
+    PagesModule,
+    HttpClientModule
+  ], *todo lo que diga module va en los imports
+
+Ahora en el data.service.ts importamos el HTTPClient verificar que sea importado de la carpeta agunlar common
+export class DataService {
+
+  constructor( private http: HttpClient ) { }
+}
+Con esto me permite crear un metodo que me permitira obtener los datos
+
+  constructor( private http: HttpClient ) { }
+
+  getPosts() {
+    return this.http.get('https://jsonplaceholder.typicode.com/posts')
+  } 
+PAra usar los datos en mi componente tenemos que ir al post.components.ts e inyectar el servicio que acabamos de crear
+
+export class PostsComponent implements OnInit {
+
+  constructor( private dataService: DataService) { }
+
+  ngOnInit(): void {	*haciendo uso del ngOnInit indica que cargue el componente cuando la pagina se carga por primera vez
+    
+    this.dataService.getPosts().subscribe( posts => {   *llamamos el metodo que se encuentra en dataService, en teoria llama la inscruccion creada en data.service.ts 
+      console.log(posts);
+    } );
+
+  }
+
+}
+ La instruccion getPosts() nos devuelve un obserbable, el observable trae la informacion que me interesa. 
+Con lo echo recientemente al inspeccionar nuestra pagina en Console podemos ver todos los datos obtenidos del archivo Json, pero todabia no se muestran en la pagina 
+
+MOSTRAR LOS POST EN LA WEB
+Para mostrar los mensajes sera necesario primero crear un arreglo de mensajes 
+edito el archivo posts.component.ts
+
+export class PostsComponent implements OnInit {
+
+  mensajes: any[] = []; *declaro el arreglo de mensajes
+
+  constructor( private dataService: DataService) { }
+
+  ngOnInit() {
+    
+    this.dataService.getPosts().subscribe( (posts: any[] **indico que los post seran un arreglo)  => {
+      console.log(posts );
+      this.mensajes= posts; ****señalo el arreglo
+    } );
+
+  }
+
+}
+
+En el archivo posts.component.html cambiamos la linea del arreglo. Agregando mensaje of mensajes
+Esto hara que se muestre un arreglo de 100 mensajes en la pagina, ahora vamos a mostrar los datos del json
+<h1>Post</h1>
+<ul class="list-group">
+    <li *ngFor="let mensaje of mensajes" class="list-group-item">
+        <h2>{{mensaje.title}}</h2>   **un header con el titulo del post o mensaje
+        <p>
+            {{mensaje.data}} **Sera el cuerpo o dato  del post o el mensaje e
+        </p>
+    </li>
+
+</ul>
+
+en nela rchivo posts.component.ts donde dice 
+this.dataService.getPosts().subscribe( (posts: any[])  => {
+      console.log(posts );
+      this.mensajes= posts;
+    } );
+nos estamos subscribiendo al componente, cada vez que recarguemos este componente se recargara toda la lista nuevamente,
+utilizando mas memoria de manera inecesaria.
+Habria que cacncelar la subcripcion cuando no se utiliza, cancelando antes de subcribirse.
+Pero angular tiene un pipe que se encarga de eso.
+El pipe | async
+El codigo quedara en posts.components.ts
+export class PostsComponent implements OnInit {
+
+  //mensajes: any[] = [];
+  mensajes: any;
+
+  constructor( private dataService: DataService) { }
+
+  ngOnInit() {
+    
+    this.mensajes = this.dataService.getPosts()
+    //.subscribe( (posts: any[])  => {
+      //console.log(posts );
+      //this.mensajes= posts;
+    //} );
+
+  }
+
+}
+
+Y en el HTML post.component.html
+<li *ngFor="let mensaje of mensajes | async " class="list-group-item">
+De desta forma al apsarse de componente se cancela la subscripcion y cuando vuelvo 
+a etrar vuelve a crear la subscripcion
+
+ESto funciona, pero si yo quiciera inspeccionar en consola del navegador
+que datos tiene el obketo json importado debo corregir unas cosas en data.service.ts
+
+import { tap } from 'rxjs/operators';
+
+getPosts() {
+    //return this.http.get('https://jsonplaceholder.typicode.com/posts')
+    return this.http.get('https://jsonplaceholder.typicode.com/posts')
+    .pipe(tap( console.log )
+      //tap( posts => {
+       // console.log(posts);
+      //})
+    );
+  } 
+Este pipe es opcional solo sera usado cuando es necesario, 
+esto permite ver como agregar operadores rxjs al observable
+
+
+******************************************************************************************************
+Video 27 Qinput Enviar informacion hacia un componente hijo desde un poadre 
+
+Mover la logica de la creacion  de la lista ordenada en el post.component.html a un componente independiente, osea reutilizar todo el codigo html y llamar mas facilmente y el post.component.html sea mas facil de leer
+
+creamos un nuevo componente
+$ng g c pages/posts/post --skipTests
+
+Con esto podemos sacar los componentes de la pagina de posts, crear un componente post y mostrar ese componente,
+esto sera util cada vez que queremos generar una lista, sera util para crar una apñlicacion de noticias..
+Esto permite enviar informacion de un componente padre a un componente hijo.
+
+Editamos el archivo posts.components.html
+
+
+<h1>Post</h1>
+<ul class="list-group">
+
+    <app-post *ngFor="let mensaje of mensajes | async "
+        [mensaje]="mensaje"></app-post>>      **esto indica que le manda al hijo
+
+
+    <!-- <li *ngFor="let mensaje of mensajes | async " class="list-group-item"> **comentario
+        <h2>{{ mensaje.title }}</h2> <p>{{mensaje.body}}</p> 
+    </li>-->
+
+</ul>
+
+
+En el archivo post.component.ts
+
+<li class="list-group-item">
+    <h2>{{ mensaje.title }}</h2>
+     <p>
+         {{mensaje.body}}
+     </p>  
+     
+</li>
+
+PAra que todo esto surta efecto tenemos que agregar el Input ena rchivo post.component.ts
+verificar que se importe InPut de @angular/core
+
+export class PostComponent implements OnInit {
+
+  @Input() mensaje;    **la propiedad mensaje va a ser recibida de un  componente exterior, si no se recibe nada seria NULL o nodefine, mensaje tiene el mismo nombre en "mensaje.title" en post.component.html
+
+
+  constructor() { }
+
+  ngOnInit(): void {
+  }
+
+}
+
+dentro del parentesis de Input("aca puedo poner como quiero que sea visto desde afuera ")
+
+
+*********************************************************************************************************************
+28- emitir eventos desde el componente hijo
+si yo quiero tocar cada elemento de pos y quiero que me retorne el id
+creamos un listener onClic en el archivo post.component donde agregamos el Input
+
+onClick() { //listener creado por nosotros
+    console.log( this.mensaje.id );
+  }
+
+Ahora en el post.component.html tenemos que agregar ele vento 
+<li (click)="onClick()" class="list-group-item">
+    <h2>{{ mensaje.title }}</h2>
+     <p>
+         {{mensaje.body}}
+     </p>  
+     
+</li>
+
+Esto nos devolvera en consola el Id del posteo, permitiendo utilizar eso apra tner mas info o redirigir a algun lado
+Pero con esto el evento sale del componente hijo y no del padre. 
+PAra que salga el evento del padre hay que hacer lo siguiente en el archivo post.component.ts la linea
+
+@Output() clickPost = new EventEmitter();
+
+pero antes, dentro del import agregar EventEmitter
+import { Component, Input, OnInit, Output, EventEmitter} from '@angular/core';
+
+En el posts.component.html agrego un nuevo evento para ser escuchado 
+
+<h1>Post</h1>
+<ul class="list-group">
+
+    <app-post *ngFor="let mensaje of mensajes | async "
+        [mensaje]="mensaje" (clickPost)="escuchaClick( $event )"></app-post>> 
+    <!-- <li *ngFor="let mensaje of mensajes | async " class="list-group-item">
+        <h2>{{ mensaje.title }}</h2> <p>{{mensaje.body}}</p> 
+    </li>-->
+</ul> 
+
+Esta linea la agregamos en posts.component.ts
+escuchaClick( id: number  ) {
+    console.log("click en: ", id);
+  }
+
+en post.component.ts 
+onClick() { //listener creado por nosotros
+    //console.log( this.mensaje.id ); cambio para enviar el evento al padre
+    this.clickPost.emit(1); //lo que esta entre parentesis es lo que recibe el padre en su evento. mas alla de que nosotros declaramos que enviabamos un num
+  }
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Termina repaso de angular
+SECCION 4
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////7
