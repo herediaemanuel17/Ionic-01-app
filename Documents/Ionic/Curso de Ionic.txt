@@ -621,3 +621,88 @@ Hacer lo mismo en la pagina de alert
 PAra ver esto se puede acceder a la documentacion de Ionic en el buscador poner 
 ion-back-button
 
+**************************************************************************************************
+36 Modulo de Videos - Header
+Replicar botton Back
+
+generamos un modulo llamado componets
+$ionic g module componets
+esto creara una carpeta componts
+
+ahora crear un componets dentro de la carpeta components,
+$ionic g component components/header *en lo posible sin ela rchivo de  prueba
+declaramos y exportamos el HeaderComponent
+
+Lo que vamos a ahcer es el doc action-sheet html
+borramos el ion-header y agregamos la ruta del header componet osea
+<app-header></app-module>
+
+el ion-header hay que llevarlo al header-component, para que tome el componente de ionic, hay que imprtarlo e el header
+en el header-component ts en imports como IonicModule
+
+en action-sheet.modules.ts importamos ComponentsModule
+
+Esto deberia mostrar la misma felcha, y si se realizan las impotaciones
+necesarias en Alert, tendremos el mismo boton en todas las paginas
+
+PAra que el titulo de la pagina varie por cad pagina, sino se repetiria el mismo
+se debe importar desde el header.componen.ts
+import { Component, Input } from '@angular/core';
+
+@Component({
+  selector: 'app-header',
+  templateUrl: './header.component.html',
+  styleUrls: ['./header.component.scss'],
+})
+export class HeaderComponent  {
+  @Input() titulo:string = '';
+} 
+ en el header.component-html agregamos
+    <ion-title class="ion-text-capitalize">  * con capitalizarlo le decimos que lo ponga prolijo
+      {{titulo}}
+     </ion-title>
+
+En action-sheet.html
+<app-header titulo="action Sheet"></app-header>
+
+**********************************************************************************************************************************************
+37 ion-list
+procedemos a incorporal la etiquea de ion-list, y dentro tendremos una lista de Items
+<ion-content>
+  <ion-list>
+  <ion-item *ngFor="let c of componentes">
+    <ion-icon name="american-football" slot="start"></ion-icon>   *el slot="start" permite que el icono no este pegado a la palabra
+    {{ c.name }}
+  </ion-item>
+  </ion-list>
+</ion-content>
+
+Para ello en el inicio.pages.ts incorporamos un componente lista, pero previamente creamos una interface componente
+
+interface Componente {
+  icon: string;
+  name: string;
+  redirectTo: string;
+}
+
+luego declaramos la lista de compoonentes
+   componentes: Componente[] =[
+    {
+      icon: 'american-futbol',
+      name: 'Action Sheet',
+      redirectTo: '/action-sheet',
+    }
+  ]; //defino un array de componentes, de la interfaz componente
+
+Otra forma de colocar el icono y que no sea directamente en el HYML puede ser
+ <ion-list>
+  <ion-item *ngFor="let c of componentes"
+	[routerLink]="c.redirectTo"	*Esto para ser redirigido a la pagina de action-sheet
+	detail>				*con esto agrego la misma flechita que se ve en iphone 
+    <ion-icon [name]="c.icon" slot="start" color="primary"></ion-icon>
+    {{ c.name }}
+  </ion-item>
+  </ion-list>
+
+****************************************************************************************************************
+SECCION 5
